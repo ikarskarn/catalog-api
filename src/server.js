@@ -1,26 +1,14 @@
-const express = require('express');
-//const app = require('./app');
-//const { PORT } = require('./config');
-const app = express();
+const knex = require('knex')
+const app = require('./app')
+const { PORT, DATABASE_URL } = require('./config')
 
-const PORT = process.env.PORT || 8000;
-
-app.use((error, req, res, next) => {
-  let response
-  if (process.env.NODE_ENV === 'production') {
-    response = { error: { message: 'server error' }}
-  } else {
-    response = { error }
-  }
-  res.status(500).json(response)
+const db = knex({
+  client: 'pg',
+  connection: DATABASE_URL,
 })
 
-const PORT = process.env.PORT || 8000
+app.set('db', db)
 
-app.get('/api/*', (req, res) => {
-  res.json({ok: true});
+app.listen(PORT, () => {
+  console.log(`Server listening at http://localhost:${PORT}`)
 })
-
-app.listen(PORT, () => console.log(`Listening on port ${PORT}`));
-
-module.exports = {app};
