@@ -1,10 +1,10 @@
-const path = require('path')
-const express = require('express')
-const xss = require('xss')
-const CategoriesService = require('./categories-service')
+const path = require('path');
+const express = require('express');
+const xss = require('xss');
+const CategoriesService = require('./categories-service');
 
-const CategoriesRouter = express.Router()
-const jsonParser = express.json()
+const CategoriesRouter = express.Router();
+const jsonParser = express.json();
 
 const serializeCategories = category => ({
     id: category.id,
@@ -12,19 +12,19 @@ const serializeCategories = category => ({
 })
 
 CategoriesRouter
-.route('/categories')
-.get((req, res, next) => {
+.route('/').get((req, res, next) => {
     const knexInstance = req.app.get('db')
     CategoriesService.getAllCategories(knexInstance)
     .then(categories => {
-        res.json(categories.map(serializeCategories))
+        //res.json(categories.map(serializeCategory))
+        res.json(categories)
     })
     .catch(next)
 })
 .post(jsonParser, (req, res, next) => {
     const { title } = req.body
     const newCategory = { title }
-    
+
     for (const [key, value] of Object.entries(newCategory)) {
         if (value == null) {
             return res.status(400).json({
@@ -41,7 +41,7 @@ CategoriesRouter
         res
         .status(201)
         .location(path.posix.join(req.originalUrl, `/${category.id}`))
-        .json(serializeCategories(category))
+        .json(serializeCategory(category))
     })
     .catch(next)
 })
@@ -49,10 +49,8 @@ CategoriesRouter
 CategoriesRouter
 .route('/:category_id')
 .all((req, res, next) => {
-    CategoriesService.getById(
-        req.app.get('db'),
-        req.params.category_id
-    )
+    const knexInstance = req.app.get('db')
+    CategoriesService.getById(knexInstance, req.params.category_id)
     .then(category => {
         if (!category) {
             return res.status(404).json({
@@ -65,6 +63,7 @@ CategoriesRouter
     .catch(next)
 })
 .get((req, res, next) => {
+    //res.json(serializeCategory(res.category))
     res.json({
         id: res.category.id,
         title: xss(res.category.title),
@@ -92,6 +91,7 @@ CategoriesRouter
             }
         })
     }
+
     CategoriesService.updateCategory(
         req.app.get('db'),
         req.params.category_id,

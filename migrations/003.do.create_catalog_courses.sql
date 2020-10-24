@@ -7,5 +7,5 @@ CREATE TABLE catalog_courses (
     learning_track_id INTEGER
         REFERENCES catalog_learning_tracks(id) ON DELETE CASCADE NOT NULL,
     certification TEXT NOT NULL,
-    description TEXT NOT NULL
+    course_description TEXT NOT NULL
 );

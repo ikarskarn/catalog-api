@@ -1,30 +1,30 @@
-const path = require('path')
-const express = require('express')
-const xss = require('xss')
+const path = require('path');
+const express = require('express');
+const xss = require('xss');
 const LearningTracksService = require('./learning-tracks-service')
 
-const learningTracksRouter = express.Router()
+const LearningTracksRouter = express.Router()
 const jsonParser = express.json()
 
-const serializeLearningTracks = learningTrack => ({
-    id: learningTrack.id,
-    title: xss(learningTrack.title),
+const serializeLearningTrack = learningTrack => ({
+  id: learningTrack.id,
+  title: xss(learningTrack.title)
 })
 
-learningTracksRouter
-.route('/learning-tracks')
+LearningTracksRouter
+.route('/')
 .get((req, res, next) => {
     const knexInstance = req.app.get('db')
     LearningTracksService.getAllLearningTracks(knexInstance)
     .then(learningTracks => {
-        res.json(learningTracks.map(serializeLearningTracks))
+        res.json(learningTracks.map(serializeLearningTrack))
     })
     .catch(next)
 })
 .post(jsonParser, (req, res, next) => {
     const { title } = req.body
     const newLearningTrack = { title }
-    
+
     for (const [key, value] of Object.entries(newLearningTrack)) {
         if (value == null) {
             return res.status(400).json({
@@ -41,12 +41,12 @@ learningTracksRouter
         res
         .status(201)
         .location(path.posix.join(req.originalUrl, `/${learningTrack.id}`))
-        .json(serializeCategories(learningTrack))
+        .json(serializeLearningTrack(learningTrack))
     })
     .catch(next)
 })
 
-learningTracksRouter
+LearningTracksRouter
 .route('/:learning-track_id')
 .all((req, res, next) => {
     LearningTracksService.getById(
@@ -65,10 +65,7 @@ learningTracksRouter
     .catch(next)
 })
 .get((req, res, next) => {
-    res.json({
-        id: res.learingTrack.id,
-        title: xss(res.learningTrack.title),
-    })
+    res.json(serializeLearningTrack(res.learningTrack))
 })
 .delete((req, res, next) => {
     LearningTracksService.deleteLearningTrack(
@@ -92,6 +89,7 @@ learningTracksRouter
             }
         })
     }
+
     LearningTracksService.updateLearningTrack(
         req.app.get('db'),
         req.params.learning-track_id,
@@ -103,4 +101,4 @@ learningTracksRouter
     .catch(next)
 })
 
-module.exports = learningTracksRouter
+module.exports = LearningTracksRouter
