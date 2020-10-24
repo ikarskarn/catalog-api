@@ -12,7 +12,7 @@ const serializeLearningTrack = learningTrack => ({
 })
 
 learningTracksRouter
-.route('/api/learning-tracks')
+.route('/')
 .get((req, res, next) => {
     const knexInstance = req.app.get('db')
     LearningTracksService.getAllLearningTracks(knexInstance)
@@ -47,7 +47,7 @@ learningTracksRouter
 })
 
 learningTracksRouter
-.route('api/learning-tracks/:learningTrack_id')
+.route('/:learningTrack_id')
 .all((req, res, next) => {
     const { learningTrack_id } = req.params
     const knexInstance = req.app.get('db')

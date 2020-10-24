@@ -19,9 +19,9 @@ app.use(helmet())
 app.use(cors())
 
 //routes
-app.use('api/categories', CategoriesRouter);
-app.use('api/learning-tracks', LearningTracksRouter);
-app.use('api/courses-router', Courses);
+app.use('/api/categories', CategoriesRouter);
+app.use('/api/learning-tracks', LearningTracksRouter);
+app.use('/api/courses', Courses);
 
 app.get('/', (req, res) => {
     res.send('Hello, world!');

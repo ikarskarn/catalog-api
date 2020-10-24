@@ -12,7 +12,7 @@ const serializeCategory = category => ({
 })
 
 categoriesRouter
-.route('/api/categories')
+.route('/')
 .get((req, res, next) => {
     const knexInstance = req.app.get('db')
     CategoriesService.getAllCategories(knexInstance)
@@ -47,7 +47,7 @@ categoriesRouter
 })
 
 categoriesRouter
-.route('api/categories/:category_id')
+.route('/:category_id')
 .all((req, res, next) => {
     const { category_id } = req.params
     const knexInstance = req.app.get('db')
