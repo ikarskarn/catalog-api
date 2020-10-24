@@ -3,21 +3,21 @@ const express = require('express');
 const xss = require('xss');
 const CategoriesService = require('./categories-service');
 
-const CategoriesRouter = express.Router();
+const categoriesRouter = express.Router();
 const jsonParser = express.json();
 
-const serializeCategories = category => ({
+const serializeCategory = category => ({
     id: category.id,
     title: xss(category.title),
 })
 
-CategoriesRouter
-.route('/').get((req, res, next) => {
+categoriesRouter
+.route('/api/categories')
+.get((req, res, next) => {
     const knexInstance = req.app.get('db')
     CategoriesService.getAllCategories(knexInstance)
     .then(categories => {
-        //res.json(categories.map(serializeCategory))
-        res.json(categories)
+        res.json(categories.map(serializeCategory))
     })
     .catch(next)
 })
@@ -46,11 +46,12 @@ CategoriesRouter
     .catch(next)
 })
 
-CategoriesRouter
-.route('/:category_id')
+categoriesRouter
+.route('api/categories/:category_id')
 .all((req, res, next) => {
+    const { category_id } = req.params
     const knexInstance = req.app.get('db')
-    CategoriesService.getById(knexInstance, req.params.category_id)
+    CategoriesService.getById(knexInstance, category_id)
     .then(category => {
         if (!category) {
             return res.status(404).json({
@@ -62,17 +63,15 @@ CategoriesRouter
     })
     .catch(next)
 })
-.get((req, res, next) => {
-    //res.json(serializeCategory(res.category))
-    res.json({
-        id: res.category.id,
-        title: xss(res.category.title),
-    })
+.get((req, res) => {
+    res.json(serializeCategory(res.category))
 })
 .delete((req, res, next) => {
+    const { category_id } = req.params
+    const knexInstance = req.app.get('db')
     CategoriesService.deleteCategory(
-        req.app.get('db'),
-        req.params.category_id
+        knexInstance,
+        category_id
     )
     .then(numRowsAffected => {
         res.status(204).end()
@@ -103,4 +102,4 @@ CategoriesRouter
     .catch(next)
 })
 
-module.exports = CategoriesRouter
+module.exports = categoriesRouter
