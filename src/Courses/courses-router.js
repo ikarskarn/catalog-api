@@ -17,7 +17,7 @@ const serializeCourse = course => ({
 })
 
 coursesRouter
-.route('/api/courses')
+.route('/')
 .get((req, res, next) => {
     const knexInstance = req.app.get('db')
     CoursesService.getAllCourses(knexInstance)
@@ -52,7 +52,7 @@ coursesRouter
 })
 
 coursesRouter
-.route('api/courses/:course_id')
+.route('/:course_id')
 .all((req, res, next) => {
     const { course_id } = req.params
     const knexInstance = req.app.get('db')
