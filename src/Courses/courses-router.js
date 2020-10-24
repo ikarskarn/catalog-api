@@ -3,7 +3,7 @@ const express = require('express');
 const xss = require('xss');
 const CoursesService = require('./courses-service');
 
-const CoursesRouter = express.Router();
+const coursesRouter = express.Router();
 const jsonParser = express.json();
 
 const serializeCourse = course => ({
@@ -16,10 +16,10 @@ const serializeCourse = course => ({
     course_description: xss(course.course_description)
 })
 
-CoursesRouter
-.route('/')
+coursesRouter
+.route('/api/courses')
 .get((req, res, next) => {
-    const knexInstance = req.app.get('db');
+    const knexInstance = req.app.get('db')
     CoursesService.getAllCourses(knexInstance)
     .then(courses => {
         res.json(courses.map(serializeCourse))
@@ -27,8 +27,8 @@ CoursesRouter
     .catch(next)
 })
 .post(jsonParser, (req, res, next) => {
-    const { category_id, title, course_code, learning_track_id, certification, course_description } = req.body;
-    const newCourse = { category_id, title, course_code, learning_track_id, certification, course_description };
+    const { category_id, title, course_code, learning_track_id, certification, course_description } = req.body
+    const newCourse = { category_id, title, course_code, learning_track_id, certification, course_description }
 
     for (const [key, value] of Object.entries(newCourse)) {
         if (value == null) {
@@ -51,13 +51,12 @@ CoursesRouter
     .catch(next)
 })
 
-CoursesRouter
-.route('/:course_id')
+coursesRouter
+.route('api/courses/:course_id')
 .all((req, res, next) => {
-    CoursesService.getById(
-        req.app.get('db'),
-        req.params.course_id
-    )
+    const { course_id } = req.params
+    const knexInstance = req.app.get('db')
+    CoursesService.getById(knexInstance, course_id)
     .then(course => {
         if (!course) {
             return res.status(404).json({
@@ -69,13 +68,15 @@ CoursesRouter
     })
     .catch(next)
 })
-.get((req, res, next) => {
+.get((req, res) => {
     res.json(serializeCourse(res.course))
 })
 .delete((req, res, next) => {
+    const { course_id } = req.params
+    const knexInstance = req.app.get('db')
     CoursesService.deleteCourse(
-        req.app.get('db'),
-        req.params.course_id
+        knexInstance,
+        course_id
     )
     .then(numRowsAffected => {
         res.status(204).end()
@@ -83,14 +84,14 @@ CoursesRouter
     .catch(next)
 })
 .patch(jsonParser, (req, res, next) => {
-    const { title, course_code, course_description } = req.body
-    const courseToUpdate = { title, course_code, course_description }
+    const { category_id, title, course_code, learning_track_id, certification, course_description } = req.body
+    const courseToUpdate = { category_id, title, course_code, learning_track_id, certification, course_description }
 
     const numberOfValues = Object.values(courseToUpdate).filter(Boolean).length
     if (numberOfValues === 0) {
         return res.status(400).json({
             error: {
-                message: `Request body must contain either 'title', 'course_code', or 'course_descriptions'`
+                message: `Request body must contain 'category', 'title', 'course_code', 'learning_track_id', 'certification', and 'course_description'`
             }
         })
     }
@@ -106,4 +107,4 @@ CoursesRouter
     .catch(next)
 })
 
-module.exports = CoursesRouter
+module.exports = coursesRouter

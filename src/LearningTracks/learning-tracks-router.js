@@ -1,18 +1,18 @@
 const path = require('path');
 const express = require('express');
 const xss = require('xss');
-const LearningTracksService = require('./learning-tracks-service')
+const LearningTracksService = require('./learning-tracks-service');
 
-const LearningTracksRouter = express.Router()
-const jsonParser = express.json()
+const learningTracksRouter = express.Router();
+const jsonParser = express.json();
 
 const serializeLearningTrack = learningTrack => ({
-  id: learningTrack.id,
-  title: xss(learningTrack.title)
+    id: learningTrack.id,
+    title: xss(learningTrack.title),
 })
 
-LearningTracksRouter
-.route('/')
+learningTracksRouter
+.route('/api/learning-tracks')
 .get((req, res, next) => {
     const knexInstance = req.app.get('db')
     LearningTracksService.getAllLearningTracks(knexInstance)
@@ -46,13 +46,12 @@ LearningTracksRouter
     .catch(next)
 })
 
-LearningTracksRouter
-.route('/:learning-track_id')
+learningTracksRouter
+.route('api/learning-tracks/:learningTrack_id')
 .all((req, res, next) => {
-    LearningTracksService.getById(
-        req.app.get('db'),
-        req.params.learning-track_id
-    )
+    const { learningTrack_id } = req.params
+    const knexInstance = req.app.get('db')
+    LearningTracksService.getById(knexInstance, learningTrack_id)
     .then(learningTrack => {
         if (!learningTrack) {
             return res.status(404).json({
@@ -64,13 +63,15 @@ LearningTracksRouter
     })
     .catch(next)
 })
-.get((req, res, next) => {
+.get((req, res) => {
     res.json(serializeLearningTrack(res.learningTrack))
 })
 .delete((req, res, next) => {
+    const { learningTrack_id } = req.params
+    const knexInstance = req.app.get('db')
     LearningTracksService.deleteLearningTrack(
-        req.app.get('db'),
-        req.params.learning-track_id
+        knexInstance,
+        learningTrack_id
     )
     .then(numRowsAffected => {
         res.status(204).end()
@@ -92,7 +93,7 @@ LearningTracksRouter
 
     LearningTracksService.updateLearningTrack(
         req.app.get('db'),
-        req.params.learning-track_id,
+        req.params.learningTrack_id,
         learningTrackToUpdate
     )
     .then(numRowsAffected => {
@@ -101,4 +102,4 @@ LearningTracksRouter
     .catch(next)
 })
 
-module.exports = LearningTracksRouter
+module.exports = learningTracksRouter
