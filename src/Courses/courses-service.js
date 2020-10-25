@@ -4,14 +4,11 @@ const CoursesService = {
         return knex.select('*').from('catalog_courses')
     },
 
-    insertCourses(knex, newCourse) {
+    insertCourse(knex, newCourse) {
         return knex
         .insert(newCourse)
         .into('catalog_courses')
         .returning('*')
-        .then(rows => {
-            return rows[0]
-        })
     },
 
     getById(knex, id) {
