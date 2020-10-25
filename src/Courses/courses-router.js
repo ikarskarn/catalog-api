@@ -8,10 +8,10 @@ const jsonParser = express.json();
 
 const serializeCourse = course => ({
     id: course.id,
-    category_id: course.category_id,
+    category_id: parseInt(course.category_id),
     title: xss(course.title),
     course_code: xss(course.course_code),
-    learning_track_id: course.learning_track_id,
+    learning_track_id: parseInt(course.learning_track_id),
     certification: xss(course.certification),
     course_description: xss(course.course_description)
 })
