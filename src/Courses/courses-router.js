@@ -29,6 +29,7 @@ coursesRouter
 .post(jsonParser, (req, res, next) => {
     const { category_id, title, course_code, learning_track_id, certification, course_description } = req.body
     const newCourse = { category_id, title, course_code, learning_track_id, certification, course_description }
+    console.log("Course Router New Course: ", newCourse);
 
     for (const [key, value] of Object.entries(newCourse)) {
         if (value == null) {
@@ -54,9 +55,8 @@ coursesRouter
 coursesRouter
 .route('/:course_id')
 .all((req, res, next) => {
-    const { course_id } = req.params
     const knexInstance = req.app.get('db')
-    CoursesService.getById(knexInstance, course_id)
+    CoursesService.getById(knexInstance, req.params.course_id)
     .then(course => {
         if (!course) {
             return res.status(404).json({
@@ -72,15 +72,12 @@ coursesRouter
     res.json(serializeCourse(res.course))
 })
 .delete((req, res, next) => {
-    const { course_id } = req.params
     const knexInstance = req.app.get('db')
     CoursesService.deleteCourse(
         knexInstance,
-        course_id
+        req.params.course_id
     )
-    .then(numRowsAffected => {
-        res.status(204).end()
-    })
+    .then(res.status(204).end())
     .catch(next)
 })
 .patch(jsonParser, (req, res, next) => {
