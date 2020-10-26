@@ -29,7 +29,6 @@ coursesRouter
 .post(jsonParser, (req, res, next) => {
     const { category_id, title, course_code, learning_track_id, certification, course_description } = req.body
     const newCourse = { category_id, title, course_code, learning_track_id, certification, course_description }
-    console.log("Course Router New Course: ", newCourse);
 
     for (const [key, value] of Object.entries(newCourse)) {
         if (value == null) {
