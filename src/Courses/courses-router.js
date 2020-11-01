@@ -84,7 +84,9 @@ coursesRouter
     })
     .delete((req, res, next) => {
         const knexInstance = req.app.get("db");
-        CoursesService.deleteCourse(knexInstance, req.params.course_id).catch(next);
+        CoursesService.deleteCourse(knexInstance, req.params.course_id)
+            .then(res.status(204).end())
+            .catch(next);
     })
     .patch(jsonParser, (req, res, next) => {
         const {
