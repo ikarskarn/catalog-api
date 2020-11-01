@@ -22,18 +22,18 @@ app.use("/api/learning-tracks", LearningTracksRouter);
 app.use("/api/courses", Courses);
 
 app.get("/", (req, res) => {
-  res.send("Hello, world!");
+    res.send("Hello, world!");
 });
 
 app.use(function errorHandler(error, req, res, next) {
-  let response;
-  if (NODE_ENV === "production") {
-    response = { error: { message: "server error" } };
-  } else {
-    response = { message: error.message, error };
-  }
-  console.error(error);
-  res.status(500).json(response);
+    let response;
+    if (NODE_ENV === "production") {
+        response = { error: { message: "server error" } };
+    } else {
+        response = { message: error.message, error };
+    }
+    console.error(error);
+    res.status(500).json(response);
 });
 
 module.exports = app;

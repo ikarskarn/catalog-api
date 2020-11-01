@@ -1,38 +1,12 @@
 const LearningTracksService = {
+    //get all learning tracks (GET)
+    getAllLearningTracks(knex) {
+        return knex.select("*").from("catalog_learning_tracks");
+    },
+    //get learning track by id (GET)
+    getById(knex, id) {
+        return knex.from("catalog_learning_tracks").select("*").where("id", id).first();
+    },
+};
 
-	getAllLearningTracks(knex) {
-		return knex.select('*').from('catalog_learning_tracks')
-	},
-
-	insertLearningTrack(knex, newLearningTrack) {
-		return knex
-		.insert(newLearningTrack)
-		.into('catalog_learning_tracks')
-		.returning('*')
-		.then(rows => {
-			return rows[0]
-		})
-	},
-
-	getById(knex, id) {
-		return knex
-		.from('catalog_learning_tracks')
-		.select('*')
-		.where('id', id)
-		.first()
-	},
-
-	deleteLearningTrack(knex, id) {
-		return knex('catalog_learning_tracks')
-		.where({ id })
-		.delete()
-	},
-	
-	updateLearningTrack(knex, id, newLearningTrackFields) {
-		return knex('catalog_learning_tracks')
-		.where({ id })
-		.update(newLearningTrackFields)
-	},
-}
-
-module.exports = LearningTracksService
+module.exports = LearningTracksService;
